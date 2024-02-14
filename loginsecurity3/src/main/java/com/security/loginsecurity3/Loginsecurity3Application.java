@@ -1,7 +1,10 @@
 package com.security.loginsecurity3;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.HashSet;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
@@ -11,6 +14,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 import com.security.loginsecurity3.models.Roles;
 import com.security.loginsecurity3.models.Users;
+import com.security.loginsecurity3.repositories.RolesRepository;
 import com.security.loginsecurity3.repositories.UsersRepository;
 
 @SpringBootApplication
@@ -18,6 +22,9 @@ public class Loginsecurity3Application implements CommandLineRunner {
 
     @Autowired
     private UsersRepository usersRepository;
+
+    @Autowired
+    private RolesRepository rolesRepository;
 
 	public static void main(String[] args) {
 		SpringApplication.run(Loginsecurity3Application.class, args);
@@ -31,13 +38,29 @@ public class Loginsecurity3Application implements CommandLineRunner {
 	}
 
     public void run(String... args) {
-        Users adminAccount = usersRepository.findByRole(Roles.ADMIN);
+
+        List<Roles> listRoles = new ArrayList<Roles>();
+        Roles admin = new Roles();
+        admin.setName("ADMIN");
+        admin.setDescription("Administrateur");
+        admin.setActif(true);
+        admin.setListUser(new HashSet<Users>());
+        Roles user = new Roles();
+        user.setName("USER");
+        user.setDescription("Utilisateur");
+        user.setActif(true);
+        user.setListUser(new HashSet<Users>());
+        listRoles.add(admin);
+        listRoles.add(user);
+        rolesRepository.saveAll(listRoles);
+
+        Users adminAccount = usersRepository.findByRoleId(1);
         if(adminAccount == null) {
             Users users = new Users();
             users.setEmail("admin@monmail.com");
             users.setFirstname("admin");
             users.setSecondname("admin");
-            users.setRole(Roles.ADMIN);
+            users.setRole(rolesRepository.findByName("ADMIN"));
             users.setPassword(new BCryptPasswordEncoder().encode("admin"));
             usersRepository.save(users);
         }

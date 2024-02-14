@@ -18,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.security.loginsecurity3.models.Roles;
 import com.security.loginsecurity3.services.UserService;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -35,14 +36,24 @@ public class SecurityConfiguration {
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests((request) -> request 
                 .requestMatchers("/api/v1/auth/**").permitAll()
-                .requestMatchers("/api/v1/admin").hasAnyAuthority(Roles.ADMIN.name())
-                .requestMatchers("/api/v1/user").hasAnyAuthority(Roles.USER.name())
+                .requestMatchers("/api/v1/admin").hasAnyAuthority("ADMIN")
+                .requestMatchers("/api/v1/user").hasAnyAuthority("USER")
                 .anyRequest().authenticated()
             )
             .sessionManagement((manager) -> manager
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
+            .logout((logout) -> logout
+                .logoutUrl("/api/v1/logout") // spécifiez l'URL de déconnexion
+                .invalidateHttpSession(true)
+                .clearAuthentication(true)
+                .logoutSuccessHandler((request, response, authentication) -> {
+                    response.setStatus(HttpServletResponse.SC_OK);
+                    response.getWriter().flush();
+                })
+            )
+            .authenticationProvider(authenticationProvider())
+            .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return httpSecurity.build();
     }

@@ -13,6 +13,7 @@ import com.security.loginsecurity3.dto.SignUpRequest;
 import com.security.loginsecurity3.dto.SigninRequest;
 import com.security.loginsecurity3.models.Roles;
 import com.security.loginsecurity3.models.Users;
+import com.security.loginsecurity3.repositories.RolesRepository;
 import com.security.loginsecurity3.repositories.UsersRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -29,13 +30,15 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     private final JWTService jwtService;
 
+    private final RolesRepository rolesRepository;
+
     @Override
     public Users signup(SignUpRequest signUpRequest) {
         Users users = new Users();
         users.setEmail(signUpRequest.getEmail());
         users.setFirstname(signUpRequest.getFirstname());
         users.setSecondname(signUpRequest.getLastname());
-        users.setRole(Roles.USER);
+        users.setRole(rolesRepository.findByName("USER"));
         users.setPassword(passwordEncoder.encode(signUpRequest.getPassword()));
 
         return usersRepository.save(users);
