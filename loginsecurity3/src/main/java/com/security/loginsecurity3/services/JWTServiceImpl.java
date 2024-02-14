@@ -21,6 +21,7 @@ public class JWTServiceImpl implements JWTService{
     public String generateToken(UserDetails userDetails) {
         return Jwts.builder()
             .setSubject(userDetails.getUsername())
+            .claim("role", userDetails.getAuthorities())
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
@@ -32,6 +33,7 @@ public class JWTServiceImpl implements JWTService{
         return Jwts.builder()
             .setClaims(extraClaims)
             .setSubject(userDetails.getUsername())
+            .claim("role", userDetails.getAuthorities())
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 604800000))
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
