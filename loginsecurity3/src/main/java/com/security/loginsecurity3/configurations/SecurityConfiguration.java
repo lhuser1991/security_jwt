@@ -43,15 +43,6 @@ public class SecurityConfiguration {
             .sessionManagement((manager) -> manager
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .logout((logout) -> logout
-                .logoutUrl("/api/v1/logout") // spécifiez l'URL de déconnexion
-                .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .logoutSuccessHandler((request, response, authentication) -> {
-                    response.setStatus(HttpServletResponse.SC_OK);
-                    response.getWriter().flush();
-                })
-            )
             .authenticationProvider(authenticationProvider())
             .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
         
