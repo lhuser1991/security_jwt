@@ -2,10 +2,13 @@ package com.security.loginsecurity3.services;
 
 import java.util.HashMap;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.http.HttpHeaders;
 
 import com.security.loginsecurity3.dto.JwtAuthenticationResponse;
 import com.security.loginsecurity3.dto.RefreshTokenRequest;
@@ -16,6 +19,7 @@ import com.security.loginsecurity3.models.Users;
 import com.security.loginsecurity3.repositories.RolesRepository;
 import com.security.loginsecurity3.repositories.UsersRepository;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -32,6 +36,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
     private final RolesRepository rolesRepository;
 
+    @Value("${jwt.cookieExpiry}")
+    private int cookieExpiry;
+
     @Override
     public Users signup(SignUpRequest signUpRequest) {
         Users users = new Users();
@@ -43,6 +50,45 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
         return usersRepository.save(users);
     }
+
+    // @Override
+    // public JwtAuthenticationResponse signin(SigninRequest signinRequest, HttpServletResponse response) {
+    //     authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(), signinRequest.getPassword()));
+
+    //     Users users = usersRepository.findByEmail(signinRequest.getEmail()).orElseThrow(() -> new IllegalArgumentException("Invalid email or password"));
+    
+    //     String jwt = jwtService.generateToken(users);
+
+    //     String refreshToken = jwtService.generateRefreshToken(new HashMap<>(), users);
+
+    //     if(jwt != null && refreshToken != null) {          
+
+    //         ResponseCookie accessCookie = ResponseCookie.from("accessToken", jwt)
+    //             .httpOnly(true)
+    //             .secure(false)
+    //             .path("/")
+    //             .maxAge(cookieExpiry)
+    //             .sameSite("None")
+    //             .build();
+    //         response.addHeader(HttpHeaders.SET_COOKIE, accessCookie.toString());
+
+    //         ResponseCookie refreshCookie = ResponseCookie.from("refreshToken", refreshToken)
+    //             .httpOnly(true)
+    //             .secure(false)
+    //             .path("/")
+    //             .maxAge(cookieExpiry)
+    //             .sameSite("None")
+    //             .build();
+    //         response.addHeader(HttpHeaders.SET_COOKIE, refreshCookie.toString());
+
+    //     }
+        
+    //     JwtAuthenticationResponse jwtAuthenticationResponse = new JwtAuthenticationResponse();
+    //     jwtAuthenticationResponse.setToken(jwt);
+    //     jwtAuthenticationResponse.setRefreshToken(refreshToken);
+
+    //     return jwtAuthenticationResponse;
+    // }
 
     @Override
     public JwtAuthenticationResponse signin(SigninRequest signinRequest) {

@@ -16,6 +16,7 @@ import com.security.loginsecurity3.services.UserService;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +30,44 @@ public class JwtAuthentificationFilter extends OncePerRequestFilter {
     private final JWTService jwtService;
     private final UserService userService;
 
+    // @Override
+    // protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
+
+    //     final String authHeader = request.getHeader("Authorization");
+    //     String jwt = null;
+    //     String userEmail = null;
+
+    //     if(request.getCookies() != null) {
+    //         for(Cookie cookie: request.getCookies()) {
+    //             if(cookie.getName().equals("accessToken")) {
+    //                 jwt = cookie.getValue();
+    //             }
+    //         }
+    //     }
+
+    //     if(jwt == null) {
+    //         filterChain.doFilter(request, response);
+    //         return;
+    //     }
+
+    //     userEmail = jwtService.extractUserName(jwt);
+
+    //     if(StringUtils.isNotEmpty(userEmail) && SecurityContextHolder.getContext().getAuthentication() == null) {
+    //         UserDetails userDetails = userService.userDetailsService().loadUserByUsername(userEmail);
+
+    //         if(jwtService.isTokenValid(jwt, userDetails)) {
+    //             SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+    //             UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                
+    //             token.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+
+    //             securityContext.setAuthentication(token);
+    //             SecurityContextHolder.setContext(securityContext);
+    //         }
+    //     }
+    //     filterChain.doFilter(request, response);
+    // }
+    
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)throws ServletException, IOException {
 
@@ -59,6 +98,5 @@ public class JwtAuthentificationFilter extends OncePerRequestFilter {
         }
         filterChain.doFilter(request, response);
     }
-    
     
 }
