@@ -5,8 +5,13 @@ import java.util.Date;
 import java.util.Map;
 import java.util.function.Function;
 
+import javax.crypto.SecretKey;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+
+import com.security.loginsecurity3.models.Users;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -16,24 +21,37 @@ import io.jsonwebtoken.security.Keys;
 
 @Service
 public class JWTServiceImpl implements JWTService{
+
+    @Value("${jwt.cookieExpiry}")
+    private int cookieExpiry;
     
     @Override
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(Users userDetails) {
+
+        Date now = new Date();
+        Date expiryDate = new Date(now.getTime() + cookieExpiry*1000L);
+
         return Jwts.builder()
             .setSubject(userDetails.getUsername())
-            .claim("role", userDetails.getAuthorities())
+            .claim("id", userDetails.getId())
+            .claim("firstname", userDetails.getFirstname())
+            .claim("secondname", userDetails.getSecondname())
+            .claim("idRole", userDetails.getRole().getId())
             .setIssuedAt(new Date(System.currentTimeMillis()))
-            .setExpiration(new Date(System.currentTimeMillis() + 1000*60*24))
+            .setExpiration(expiryDate)
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
             .compact();
     }
 
     @Override
-    public String generateRefreshToken(Map<String, Object> extraClaims, UserDetails userDetails) {
+    public String generateRefreshToken(Map<String, Object> extraClaims, Users userDetails) {
         return Jwts.builder()
             .setClaims(extraClaims)
             .setSubject(userDetails.getUsername())
-            .claim("role", userDetails.getAuthorities())
+            .claim("id", userDetails.getId())
+            .claim("firstname", userDetails.getFirstname())
+            .claim("secondname", userDetails.getSecondname())
+            .claim("idRole", userDetails.getRole().getId())
             .setIssuedAt(new Date(System.currentTimeMillis()))
             .setExpiration(new Date(System.currentTimeMillis() + 604800000))
             .signWith(getSigninKey(), SignatureAlgorithm.HS256)
@@ -61,7 +79,7 @@ public class JWTServiceImpl implements JWTService{
         return claimsResolvers.apply(claims);
     }
 
-    private Key getSigninKey() {
+    public Key getSigninKey() {
         byte[] key = Decoders.BASE64.decode("fgG2xM/CvNir0PXdv79arocwJij4T2UyMuvMounCjBQ");
         return Keys.hmacShaKeyFor(key);
     }

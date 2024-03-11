@@ -30,6 +30,43 @@ public class SecurityConfiguration {
 
     private final UserService userService;
 
+    // @Bean
+    // public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception {
+    //     httpSecurity
+    //         .csrf(AbstractHttpConfigurer::disable)
+    //         .authorizeHttpRequests((request) -> request 
+    //             .requestMatchers("/api/v1/auth/**").permitAll()
+    //             .requestMatchers("/api/v1/admin").hasAnyAuthority("ADMIN")
+    //             .requestMatchers("/api/v1/user").hasAnyAuthority("USER")
+    //             .anyRequest().authenticated()
+    //         )
+    //         .sessionManagement((manager) -> manager
+    //             .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+    //         )
+    //         .authenticationProvider(authenticationProvider())
+    //         .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
+        
+    //     return httpSecurity.build();
+    // }
+
+    // @Bean
+    // public AuthenticationProvider authenticationProvider() {
+    //     DaoAuthenticationProvider authenticationProvider = new DaoAuthenticationProvider();
+    //     authenticationProvider.setUserDetailsService(userService.userDetailsService());
+    //     authenticationProvider.setPasswordEncoder(passwordEncoder());
+    //     return authenticationProvider;
+    // }
+
+    // @Bean
+    // public PasswordEncoder passwordEncoder() {
+    //     return new BCryptPasswordEncoder();
+    // }
+
+    // @Bean
+    // public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
+    //     return config.getAuthenticationManager();
+    // }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity)throws Exception {
         httpSecurity
@@ -43,8 +80,7 @@ public class SecurityConfiguration {
             .sessionManagement((manager) -> manager
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
             )
-            .authenticationProvider(authenticationProvider())
-            .addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
+            .authenticationProvider(authenticationProvider()).addFilterBefore(jwtAuthentificationFilter, UsernamePasswordAuthenticationFilter.class);
         
         return httpSecurity.build();
     }

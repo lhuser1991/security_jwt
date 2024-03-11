@@ -1,0 +1,15 @@
+<section>
+    <h2>Page d'authentification</h2>
+
+    <form (ngSubmit)="onSubmit()">
+
+        <input type="text" name="email" id="email" [(ngModel)]="signinRequest.email" required>
+
+        <input type="password" name="password" id="password" [(ngModel)]="signinRequest.password" required>
+
+        <button type="submit">Login</button>
+        
+    </form>
+
+    
+</section>
